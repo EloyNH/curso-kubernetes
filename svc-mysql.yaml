@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql8
+  namespace: default
+spec:
+  ports:
+  - port: 3306 #puerto para acceder desde el exterior
+    protocol: TCP
+    targetPort: 3306 #puerto interno
+  selector:
+    app: mysql8
+  type: ClusterIP

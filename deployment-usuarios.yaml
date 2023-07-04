@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msvc-usuarios
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: msvc-usuarios
+  template:
+    metadata:
+      labels:
+        app: msvc-usuarios
+    spec:
+      containers:
+      - image: eloynh/usuarios:latest
+        name: usuarios
+        ports:
+        - containerPort: 8001
+        env:
+          - name: LB_AUTH_ISSUER_URI
+            valueFrom:
+              configMapKeyRef:
+                name: msvc-usuarios
+                key: lb_auth_issuer_uri
+          - name: LB_USUARIOS_URI
+            valueFrom:
+              configMapKeyRef:
+                name: msvc-usuarios
+                key: lb_usuarios_uri
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: msvc-usuarios
+                key: port
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: msvc-usuarios
+                key: db_host
+          - name: DB_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: msvc-usuarios
+                key: database
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: msvc-usuarios
+                key: username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: msvc-usuarios
+                key: password
+          - name: CURSOS_URL
+            valueFrom:
+              configMapKeyRef:
+                name: msvc-usuarios
+                key: cursos_url
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+#        readinessProbe:
+#          httpGet:
+#            port: 8001
+#            path: /actuator/health/readiness
+#            scheme: HTTP
+#          initialDelaySeconds: 5
+#          periodSeconds: 20
+#          timeoutSeconds: 10
+#        livenessProbe:
+#          httpGet:
+#            port: 8001
+#            path: /actuator/health/liveiness
+#            scheme: HTTP
+#          initialDelaySeconds: 10
+#          periodSeconds: 30
+#          timeoutSeconds: 10
+#        resources:
+#          requests:
+#            memory: 512Mi
+#            cpu: 400m # milicore
+#          limits:
+#            memory: 800Mi
+#            cpu: 500m

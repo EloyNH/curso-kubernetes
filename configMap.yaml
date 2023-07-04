@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: msvc-usuarios #este nombre tiene que ser igual al nombre del servicio: spring.application.name=msvc-usuarios
+  namespace: default
+data:
+  lb_auth_issuer_uri: "http://127.0.0.1:36185" # se obtiene de $ minikube service msvc-auth --url
+  lb_usuarios_uri: "http://127.0.0.1:35611" # se obtiene de $ minikube service msvc-usuarios --url
+  port: "8001"
+  db_host: "mysql8:3306"
+  database: "msvc_usuarios"
+  cursos_url: "msvc-cursos:8002"
+  application.yml: |-
+    config:
+      texto: Configurando ambiente por defecto
+    ---
+    spring:
+      config:
+        activate:
+          on-profile: dev
+    config:
+      texto: Configurando ambiente de desarrollo
+    ---
+    spring:
+      config:
+        activate:
+          on-profile: prod
+    config:
+      texto: Configurando ambiente de produccion      
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: msvc-cursos
+  namespace: default
+data:
+  port: "8002"
+  db_host: "postgres14:5432"
+  database: "msvc_cursos"
+  usuarios_url: "msvc-usuarios:8001"
